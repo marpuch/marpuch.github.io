@@ -1,0 +1,309 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Java VM Security</title>
+        <meta name="description" content="Add one more layer of security to your apps">
+		<meta name="author" content="Marek Puchalski">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css">
+        <link rel="stylesheet" href="css/own.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+        <div id="cgLogo" style="background: url(img/cg_s.png);
+                                position: absolute;
+                                bottom: 90px;
+                                left: 45%;
+                                width: 121px;
+                                height: 27px;"></div>
+ 		<div class="reveal">
+			<div class="slides">
+
+<section>
+    <h1>Java VM Security</h1>
+    <p><small><a href="mailto:marek.puchalski@capgemini.com">marek.puchalski@capgemini.com</a>, @marek_devsec</small>
+    </p>
+</section>
+
+<section>
+    <h2>About me</h2>
+    <p>
+        <img class="plain" src="img/me.png"/>
+    </p>
+    <p><small>developer, security maniac, <a href="https://www.owasp.org/index.php/Main_Page">OWASP</a> member</small></p>
+</section>
+
+<section>
+    <h2>Purpose</h2>
+    <p>Protect the users from developers</p>
+</section>
+
+<section>
+    <h2>Agenda</h2>
+    <ul>
+        <li>Story</li>
+        <li>Code security by example</li>
+        <li>Solving "confused deputy" problem</li>
+        <li>Questions</li>
+    </ul>
+</section>
+
+<section>
+    <section>
+        <h1>Story</h1>
+    </section>
+    
+    <section>
+        <h2>OWASP Top 10 2013</h2>
+        <img src="img/owasp.png"/>
+    </section>
+
+    <section>
+        <h2>The first thing I have found</h2>
+        <img src="img/victims.png" alt="">
+        <p><small>Source: <a href="https://www.victi.ms">www.victi.ms</a></small></p>
+    </section>
+    
+    <section>
+        <h2>Scan of my project</h2>
+        <p class="code">utc-1.10.3.jar CVE-2013-2186<br/>
+xstream-1.4.3.jar CVE-2013-7285<br/>
+commons-httpclient.jar CVE-2012-5783</p>
+    </section>
+    
+    <section>
+        <h2>Good job!</h2>
+        <p>Shall I tell about the tool to others?</p>
+    </section>
+
+    <section><img src="img/mema.jpg" alt=""></section>
+
+    <section>
+        <h2>Think!</h2>
+        <p>What if your best idea is a disaster?</p>
+    </section>
+    
+    <section>
+        <h2>Good idea turning bad</h2>
+        <img src="img/struts.png" alt="">
+        <small>Apache Struts: <a href="https://www.cvedetails.com/product/6117/Apache-Struts.html">https://www.cvedetails.com/product/6117/Apache-Struts.html</a></small>
+    </section>
+       
+    <section>
+        <h2>Compare with Pivotal</h2>
+        <img src="img/pivotal.png" alt="">
+        <small>Pivotal: <a href="https://www.cvedetails.com/vendor/14939/Pivotal.html">https://www.cvedetails.com/vendor/14939/Pivotal.html</a></small>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Code Security by Example</h1>
+    </section>
+    
+    <section data-background-video="video/001.mp4"></section>
+    <section data-background-video="video/002.mp4"></section>
+    <section data-background-video="video/003.mp4"></section>
+    <section data-background-video="video/004.mp4"></section>
+    <section data-background-video="video/005.mp4"></section>
+    <section data-background-video="video/006.mp4"></section>
+    <section data-background-video="video/007.mp4"></section>
+    
+    <section>
+        <h2>Quick How-To</h2>
+        <ol>
+            <li>Turn on the security manager:<br/><span class="code">-Djava.security.manager</span></li>
+            <li>Define emtpy policy file:<br/><span class="code">-Djava.security.policy==my.policy</span><br/>(NOTE: for web servers/apps - start with a template)</li>
+            <li>Run -&gt; Crash -&gt; Fix -&gt; Loop</li>
+            <li>Profit</li>
+        </ol>
+    </section>
+    
+    <section>
+        <h2>Should we use it?</h2>
+        <ul>
+            <li>Yes! Why? Because the world is cruel</li>
+            <li>It lowers the attack surface (Principle of Least Privilege)</li>
+        </ul>
+    </section>
+
+   <section>
+        <h2>Reason</h2>
+        <pre><code class="hljs" data-trim contenteditable>
+@RequestMapping("/")
+public String greeting() {
+    System.exit(0);
+    return "Hello World";
+}
+        </code></pre>
+        <img class="fragment" src="img/evilest.gif" alt="">
+    </section>
+    
+   <section>
+        <h2>Reason</h2>
+        <pre><code class="hljs" data-trim contenteditable>
+// dom4j
+SAXReader reader = new SAXReader();
+Document document = reader.read("test.xml");
+
+// jdom
+SAXBuilder builder = new SAXBuilder();
+Document document = builder.build(new File("test.xml"));
+
+// jaxb
+JAXBContext jc = JAXBContext.newInstance(Strona.class);
+XMLInputFactory xif = XMLInputFactory.newFactory();
+XMLStreamReader xsr = xif.createXMLStreamReader(new StreamSource("test.xml"));
+Unmarshaller unmarshaller = jc.createUnmarshaller();
+Strona customer = (Strona) unmarshaller.unmarshal(xsr);
+        </code></pre>
+    </section> 
+
+     <section>
+         <h2>OWASP Top 10 2017</h2>
+         <img style="height: auto; width: auto; max-width: 800px; max-height: 700px;" src="img/owasp_new.png" alt="">
+     </section>
+      
+    <section>
+        <h2>Threat</h2>
+        <pre><code class="hljs" data-trim contenteditable>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE main [ 
+&nbsp;&nbsp;&lt;!ENTITY ee SYSTEM "/etc/passwd"&gt;
+] &gt;
+&lt;main&gt;
+&nbsp;&nbsp;&amp;ee;
+&lt;/main&gt;
+        </code></pre>
+    </section>
+    
+    <section>
+        <h2>Proper code</h2>
+        <pre><code class="hljs" data-trim contenteditable>
+// dom4j
+SAXReader reader = new SAXReader();
+reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+Document document = reader.read("test.xml");
+
+// jdom
+SAXBuilder builder = new SAXBuilder();
+builder.setExpandEntities(false);
+Document document = builder.build(new File("test.xml"));
+
+// jaxb
+JAXBContext jc = JAXBContext.newInstance(Strona.class);
+XMLInputFactory xif = XMLInputFactory.newFactory();
+xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+XMLStreamReader xsr = xif.createXMLStreamReader(new StreamSource("test.xml"));
+Unmarshaller unmarshaller = jc.createUnmarshaller();
+Strona customer = (Strona) unmarshaller.unmarshal(xsr);
+        </code></pre>
+        <p><small>Source: <a href="https://github.com/marpuch/Java-Sec-Examples/tree/master/xxe">https://github.com/marpuch/Java-Sec-Examples/tree/master/xxe</a></small></p>
+    </section> 
+   
+    <section>
+        <h2>Are we using it already?</h2>
+        <ul>
+            <li>Probably no. You would notice it if you would</li>
+            <li>Software tends to work better without it :(</li>
+        </ul>
+    </section>
+    
+    <section>
+        <h2>Real life example</h2>
+        <img style="height: auto; width: auto; max-width: 800px; max-height: 460px;" src="img/real_policy.png" alt="">
+        <p><small>Source: <a href="https://tomcat.apache.org/tomcat-7.0-doc/security-manager-howto.html">https://tomcat.apache.org/tomcat-7.0-doc/security-manager-howto.html</a></small></p>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Confused deputy</h1>
+    </section>
+    
+    <section>
+        <h2>Problem</h2>
+        <img class="plain" src="img/confused_deputy_problem.png" alt="">
+        <p><small>See also: <a href="https://en.wikipedia.org/wiki/Confused_deputy_problem">https://en.wikipedia.org/wiki/Confused_deputy_problem</a></small></p>
+    </section>
+    
+    <section>
+        <h2>Attack</h2>
+        <img class="plain" src="img/confused_deputy_attack.png" alt="">
+    </section>
+    
+    <section>
+        <h2>Code</h2>
+        <img style="height: auto; width: auto; max-width: 800px; max-height: 400px;" src="img/confused_deputy_arch.png" alt="">
+        <p><small>Sources: <a href="https://github.com/marpuch/confused_deputy">https://github.com/marpuch/confused_deputy</a></small></p>
+    </section>
+    
+    <section data-background-video="video/101.mp4"></section>
+    <section data-background-video="video/102.mp4"></section>
+    <section data-background-video="video/103.mp4"></section>
+    <section data-background-video="video/104.mp4"></section>
+</section>
+
+<section>
+    <h2>Summary</h2>
+    <ul>
+        <li>What have we seen</li>
+        <ul>
+            <li>Using code security features for good and justice</li>
+        </ul>
+        <li>What have we NOT seen</li>
+        <ul>
+            <li>Code signing</li>
+            <li>JAAS integration</li>
+            <li>Writing own permissions</li>
+            <li>...</li>
+        </ul>
+    </ul>
+</section>
+
+<section>
+    <h1>Questions?</h1>
+    <p><a href="mailto:marek.puchalski@capgemini.com">marek.puchalski@capgemini.com</a></p>
+    <p>@marek_devsec</p>
+</section>
+
+            </div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+                
+                transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
