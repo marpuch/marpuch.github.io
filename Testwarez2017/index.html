@@ -1,0 +1,497 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Web Application Security Test Automation</title>
+        <meta name="description" content="Testwarez slides for the topic of security test automation">
+		<meta name="author" content="Marek Puchalski">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css">
+        <link rel="stylesheet" href="css/own.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+        <div id="cgLogo" style="background: url(img/cg_s.png);
+                                position: absolute;
+                                top: 90px;
+                                left: 50px;
+                                width: 150px;
+                                height: 33px;"></div>
+        <div id="scLogo" style="background: url(img/testwarez.png);
+                                position: absolute;
+                                top: 90px;
+                                right: 50px;
+                                width: 199px;
+                                height: 27px;"></div>
+<!--
+        <div id="footer" style="position: absolute;
+                                margin-left: auto;
+                                margin-right: auto;
+                                left: 0;
+                                right: 0;"></div>
+-->
+		<div class="reveal">
+			<div class="slides">
+
+<section>
+    <h1>(Web Application) Security Test Automation</h1>
+    <p><small><a href="mailto:marek.puchalski@capgemini.com">marek.puchalski@capgemini.com</a>, @marek_devsec</small>
+    </p>
+</section>
+
+<section>
+    <img src="img/freedom.jpg"/>
+</section>
+
+<section>
+    <h2>About me</h2>
+    <p>
+        <img class="plain" src="img/me.png"/>
+    </p>
+    <p><small>developer, security maniac, <a href="https://www.owasp.org/index.php/Main_Page">OWASP</a> member</small></p>
+</section>
+
+<!--<section>
+    <h2>Why security?</h2>
+    <span class="fragment">
+    <ul>
+        <li>99,7% of applications tested were vulnerable</li>
+        <li>11 - median number of flaws per application</li>
+        <li>10% of findings discovered were critical or high risk</li>
+    </ul>
+    <p><small><a href="https://www2.trustwave.com/rs/815-RFM-693/images/2017%20Trustwave%20Global%20Security%20Report-FINAL-6-20-2017.pdf">
+        2017 Trustwave Global Security Report</a></small></p>
+    </span>
+</section>-->
+
+<section>
+    <section>
+        <h1>Security in projects</h1>
+    </section>
+    <section data-background-image="img/construction-site.jpg">
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        <p><small style="background-color:white">Source: <a href="http://www.michaelmolloy.co.uk/construction-photography.html">http://www.michaelmolloy.co.uk/construction-photography.html</a></small></p>
+    </section>
+    <section>
+        <h2>Waterfall</h2>
+        <img src="img/waterfall.png" class="plain">
+    </section>
+    <section data-background-image="img/lego.jpg">
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        <p><small style="background-color:white">Source: <a href="http://www.letgoyourmind.com/wp-content/uploads/2017/03/buildingtall.jpg">http://www.letgoyourmind.com/wp-content/uploads/2017/03/buildingtall.jpg</a></small></p>
+    </section>
+    <section>
+        <h2>Agile</h2>
+        <img src="img/agile.png" class="plain"/>
+    </section>
+    <section>
+        <h2>Security in waterfall projects</h2>
+        <img src="img/waterfall2.png" class="plain"/>
+    </section>
+    <section>
+        <h2>Security in agile projects</h2>
+        <img src="img/agile2.png" class="plain"/>
+    </section>
+<!--    <section>
+        <h2>Security dilemma</h2>
+        <ul>
+            <li><b>Option 1:</b> Security assurance becomes a long tail of your development lifecycle</li>
+            <li><b>Option 2:</b> Security assurance disrupts your development process</li>
+            <li class="fragment"><b>Option 3:</b> Change the rules of the game</li>
+        </ul>
+    </section>-->
+    <section>
+        <h2>Best idea so far</h2>
+        <p>Automate security tests</p>
+        <aside class="notes">
+            Treat security requirements the same way as 
+        </aside>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>What is security</h1>
+    </section>
+    <!--<section>
+        <h2>Application Security</h2>
+        <img src="img/cia.png"/>
+    </section>
+    <section>
+        <h2>Source of security requirements</h2>
+        <ul>
+            <li>Project requirements</li>
+            <li>Threat modeling</li>
+            <li>Industrial standards</li>
+        </ul>
+    </section>-->
+    <section>
+        <h2>OWASP ASVS</h2>
+        <img src="img/asvs.png" alt="">
+        <ul>
+            <li>Provides a list of requirements for secure development</li>
+            <li>Defines different security assurance levels (Opportunistic, Standard, Advanced, also called Level 1, 2, 3)</li>
+            <li>Use it as a development guidance, metric or as a basis for specifying security requirements</li>
+        </ul>
+    </section>
+    <section><h2>Example</h2><img src="img/asvs1.png" alt=""></section>
+    <section><img src="img/asvs2.png" class="plain" alt=""></section>
+</section>
+
+<section>
+    <h2>Just before we start</h2>
+    <ul>
+        <li>Don't automate everything</li>
+        <li>Like always - prioritize</li>
+    </ul>
+</section>
+
+<!--<section>
+    <section>
+        <h1>Don't automate everything</h1>
+    </section>
+    <section>
+        <h2>Automation sometimes doesn't make sense</h2>
+        <ul>
+            <li>It's hard to automate process requirement verification (as opposed to software requirement verification)</li>
+            <li>Example:</li>
+            <ul>
+                <li>Verify that all application components are identified and are known to be needed.</li>
+                <li>Verify that a high-level architecture for the application has been defined.</li>
+                <li>Verify that there is an explicit policy for how cryptographic keys are managed</li>
+            </ul>
+        </ul>
+    </section>
+    <section>
+        <h2>Just because you can doesn't mean you should</h2>
+        <ul>
+            <li>Some tests would be simply inefficient</li>
+            <li>Example:</li>
+            <ul>
+                <li>Verify that secrets, API keys, and passwords are not included in the source code, or online source code repositories.</li>
+                <li>Verify that the application source code, and as many third party libraries as possible, does not contain back doors, Easter eggs, and logic flaws in authentication, access control, input validation, and the business logic of high value transactions.</li>
+            </ul>
+        </ul>
+    </section>
+    <section>
+        <h2>Prioritize</h2>
+        <ul>
+            <li>Start with biggest risks first</li>
+            <li>What are biggest risks? Depends. Usually input validation, authentication and access control flaws</li>
+        </ul>
+    </section>
+</section>-->
+
+<!-- <section>
+    <section>
+        <h1>Security Test Automation</h1>
+    </section>
+   <section>
+        <h2>Approaches</h2>
+        <ul>
+            <li>Unit tests</li>
+            <li>Static code analysis</li>
+            <li>Dynamic code analysis</li>
+        </ul>
+    </section>
+</section>-->
+
+<section>
+    <section>
+        <h1>Example 1</h1>
+        <blockquote>ASVS 11.8: Verify that the <span class="code">X-XSS-Protection: 1; mode=block</span> header is in place.</blockquote>
+    </section>
+    <section>
+        <h2>What are headers?</h2>
+        <img src="img/headers.png" class="plain" alt="">
+    </section>
+    <section>
+        <h2>What does X-XSS-Protection do?</h2>
+        <ul>
+            <li>Offers (reflected) XSS protection</li>
+            <li>Turned on by default, but works in the sanitization mode</li>
+            <li>Turn the most rigorous mode on over <span class="code">X-XSS-Protection: 1; mode=block</span></li>
+        </ul>
+    </section>
+    <section>
+        <h2>Preferred type of test</h2>
+        <img src="img/cicd.png" >
+        <p><small>Source: <a href="https://blogs.msdn.microsoft.com/visualstudioalmrangers/2017/04/20/set-up-a-cicd-pipeline-to-run-automated-tests-efficiently/">https://blogs.msdn.microsoft.com/visualstudioalmrangers/2017/...</a></small></p>
+    </section>
+    <section>
+        <h2>Code</h2>
+        <pre><code data-trim contenteditable>import static io.restassured.RestAssured.*;
+
+(...)
+
+when()
+    .get("https://haveibeenpwned.com/")
+.then()
+    .statusCode(200)
+    .header("X-XSS-Protection", "1; mode=block");
+</code></pre>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Example 2</h1>
+        <blockquote>ASVS 5.5: Verify that input validation routines are enforced on the server side.</blockquote>
+    </section>
+    <section>
+        <img style="height: auto; width: auto; max-width: 700px; max-height: 500px;" src="img/demoqa.png" alt="">
+        <p><small>Source: <a href="http://demoqa.com/contact/">http://demoqa.com/contact/</a></small></p>
+    </section>
+    <section>
+        <h2>Request</h2>
+        <img src="img/request.png" alt="">
+    </section>
+    <section>
+        <h2>Response</h2>
+        <img src="img/response.png" alt="">
+    </section>
+    <section>
+        <h2>Code</h2>
+        <pre><code data-trim contenteditable>import static io.restassured.RestAssured.*;
+(...)
+String body = TEMPLATE.replace("&lt;name&gt;", "Marek")
+                      .replace("&lt;email&gt;", "marek@test");
+given(new RequestSpecBuilder()
+      .addHeader("X-Requested-With", "XMLHttpRequest")
+      .addHeader("Accept", "application/json, text/javascript, */*; q=0.01")
+      .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+      .setBody(body)
+      .build()).
+when()
+    .post("http://demoqa.com/contact/").
+then()
+    .statusCode(200)
+    .body("mailSent", equalTo(false),
+          "invalids[0].message", equalTo("Email address seems invalid."));
+</code></pre>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h2>Wait! Is this really this easy?</h2>
+        <img src="img/what.png" class="plain" alt="">
+    </section>
+    <section>
+        <h2>I would not call that "easy"</h2>
+        <ul>
+            <li>Understanding security requirements takes time</li>
+            <li>We need to deal with traffic on the HTTP level</li>
+            <li>Some technologies are easier to automate than others</li>
+            <li>We didn't show how to deal with authentication or CSRF protection</li>
+        </ul>
+        <p class="fragment"><b>But yes, in many cases the code can still be sexy</b></p>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Example 3</h1>
+        <blockquote>ASVS 10.16: Verify that the TLS settings are in line with current leading practice, particularly as common configurations, ciphers, and algorithms become insecure.</blockquote>
+    </section>
+    <section>
+        <h2>What is TLS?</h2>
+        <p>It's the "S" in HTTPS :)</p>
+    </section>
+    <section>
+        <h2>Understanding TLS is hard</h2>
+        <ul>
+            <li>Understand: PKI, CA, MAC, OCSP, CSR, cipher suites, ...</li>
+            <li>Use: RSA, ECDHE, DHE, AES, GCM, CBC, SHA, ...</li>
+            <li>Don't use: MD5, RC4, SSL, ...</li>
+            <li>Prevent: Drown, BEAST, padding oracle, CRIME, TIME, BREACH, Heartbleed, DUAL_EC_DRBG, ...</li>
+        </ul>
+    </section>
+    <section>
+        <h2>How to deal with it?</h2>
+        <img style="height: auto; width: auto; max-width: 700px; max-height: 500px;" src="img/ssllabs.png"/>
+        <p><small><a hef="https://www.ssllabs.com/ssltest/">https://www.ssllabs.com/ssltest/</a></small></p>
+    </section>
+    <section>
+        <h2>Code</h2>
+        <pre><code data-trim contenteditable>import io.beekeeper.ssllabs.junit.BaseSSLLabsTest;
+
+@RunWith(Parameterized.class)
+public class AppTest extends BaseSSLLabsTest
+{
+	public AppTest(String host) {
+		super(host);
+	}
+	
+    @Parameters(name = "Host: {0}")
+    public static Iterable&lt;String&gt; data() {
+        return Arrays.asList("marek.puchal.ski", "www.poczta-polska.pl");
+    }
+}
+</code></pre>
+        <p><small>Example API: <a href="https://github.com/beekpr/ssllabs">https://github.com/beekpr/ssllabs</a></small></p>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Example 4</h1>
+        <blockquote>ASVS 1.11: Verify that all application components, libraries, modules, frameworks, platform, and operating systems are free from known vulnerabilities.</blockquote>
+    </section>
+    <section>
+        <h2>Example Equifax (Struts 2, CVE-2017-5638)</h2>
+        <img src="img/struts.png"/>
+        <p><small><a href="https://www.imperva.com/blog/2017/03/cve-2017-5638-new-remote-code-execution-rce-vulnerability-in-apache-struts-2/">Source - Imperva</a></small></p>
+
+        <p>BTW: Struts 2 had <a href="https://nvd.nist.gov/vuln/search/results?adv_search=false&form_type=basic&results_type=overview&search_type=all&query=cve-2016+struts+2">15 known vulnerabilities in 2016</a></p>
+    </section>
+    <section>
+        <h2>How to deal with it?</h2>
+        <ul>
+            <li style="text-decoration: line-through;">Update every library every release</li>
+            <li>Or use a library scanning tool</li>
+            <ul>
+                <li><a href="https://www.owasp.org/index.php/OWASP_Dependency_Check">OWASP Dependency Check</a></li>
+                <li style="opacity: 0.5;"><a href="http://www.victi.ms/">Victims</a></li>
+                <li style="opacity: 0.1;">Black Duck (<a href="https://copilot.blackducksoftware.com/">Copilot</a>)</li>
+                <li style="opacity: 0.05;">Many other</li>
+            </ul>
+        </ul>
+    </section>
+    <section>
+        <h2>Code</h2>
+        <pre><code data-trim contenteditable>.\bin\dependency-check.bat --project victim --scan victim\*
+</code></pre>
+    </section>
+    <section>
+        <h2>OWASP Dependency Check</h2>
+        <img src="img/report.png" alt="">
+    </section>
+</section>
+
+<section>
+    <section>
+        <h1>Bonus 1</h1>
+        <p>Static code analysis</p>
+        <pre><code data-trim contenteditable>public List&lt;String&gt; find(String mode) {
+  String sql = &quot;select text from portfolio where mode = '&quot; + mode + &quot;'&quot;;
+  RowMapper&lt;String&gt; mapper = new RowMapper&lt;String&gt;() {
+    @Override
+    public String mapRow(ResultSet rs, int arg1) throws SQLException {
+      return rs.getString(&quot;text&quot;);
+    }
+  };
+  List&lt;String&gt; result = jdbcTemplate.query(sql, new Object[] {}, mapper);
+  return result;
+}
+</code></pre>
+    </section>
+    <section>
+        <h2>Static code analysis</h2>
+        <p>Pro:</p>
+        <ul>
+            <li>Good at searching after certain weakness categories</li>
+        </ul>
+        <p>Con:</p>
+        <ul>
+            <li>Commercial tools are very expensive</li>
+            <li>Many false positives</li>
+            <li>Need to understand the code well</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Challenge</h2>
+        <ul>
+            <li>Doing Java?</li>
+            <li>You probably know FindBugs already</li>
+            <li>Run the FindSecBugs (<a href="https://find-sec-bugs.github.io/">find-sec-bugs.github.io/</a>) plugin</li>
+            <li>Profit</li>
+        </ul>
+        <p><small>More tools: <a href="https://www.owasp.org/index.php/Static_Code_Analysis#OWASP_Tools">https://www.owasp.org/index.php/Static_Code_Analysis#OWASP_Tools</a></small></p>
+    </section>
+</section>
+
+<section>
+    <section>
+        <h2>Bonus 2</h2>
+        <p>Dynamic code analysis</p>
+    </section>
+    <section>
+        <h2>Primary pentester tool</h2>
+        <ul>
+            <li>Example: Burp Suite, <b>OWASP ZAP</b>, other</li>
+            <li>Forward proxy on steroids</li>
+            <li>Can perform automated scans (active scan)</li>
+        </ul>
+        <img src="img/zap03.png"/>
+        <p style="color:red">Only use it on systems you own or have written permission to test!</p>
+    </section>
+    <section>
+        <h2>Simplest use case</h2>
+        <img src="img/zap_example.png" style="height: auto; width: auto; max-width: 700px; max-height: 500px;" class="plain" alt="">
+    </section>
+    <section>
+        <h2>Challenge</h2>
+        <ol>
+            <li>Run Zap, then perform an automated test</li>
+            <li>Run Zap, click through the app manually, then run the active scan</li>
+            <li>Run your regression suite through ZAP, then run the active scan</li>
+            <li>Make it all part of your CI/CD pipeline by integrating it all with Docker+Jenkins</li>
+        </ol>
+    </section>
+</section>
+
+<section>
+    <h2>Summary</h2>
+    <ul>
+        <li>First step to security assurance - know what is required</li>
+        <li>Don't fear HTTP - implementation is not necessary hard</li>
+        <li>Special cases - TLS and vulnerable libraries</li>
+        <li>Homework: static and dynamic code analysis</li>
+    </ul>
+</section>
+
+<section>
+    <h1>Questions?</h1>
+    <p>@marek_devsec</p>
+    <p><a href="mailto:marek.puchalski@capgemini.com">marek.puchalski@capgemini.com</a></p>
+</section>
+
+            </div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+                
+                transition: 'convex', // none/fade/slide/convex/concave/zoom
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
